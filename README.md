@@ -1,4 +1,4 @@
 flask-jsonapi
 =============
 
-JSONAPI-compliant view generators for Flask
+JSON API-compliant view generators for Flask
