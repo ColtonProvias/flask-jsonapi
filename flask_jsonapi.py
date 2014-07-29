@@ -78,9 +78,12 @@ class SQLAlchemyEndpoint(JSONAPIEndpoint):
     def query(self):
         return self.session.query(self.model_class)
 
-    @property
-    def obj_getter(self):
-        return self.query.get
+    def get_obj(self, object_id):
+        if ',' in object_id:
+            object_ids = object_id.split(',')
+            return [self.query.get(obj_id) for obj_id in object_ids]
+        else:
+            return self.query.get(object_id)
 
     @property
     def serializer(self):
@@ -94,7 +97,7 @@ class SQLAlchemyEndpoint(JSONAPIEndpoint):
 
     def object_get(self, object_id):
         include, sort, fields, args = self.parse_request()
-        obj = self.obj_getter(object_id)
+        obj = self.get_obj(object_id)
         if obj is None:
             abort(404)
         return self.render_response(self.serializer(obj, fields=fields,
@@ -102,6 +105,8 @@ class SQLAlchemyEndpoint(JSONAPIEndpoint):
 
     def object_delete(self, object_id):
         obj = self.obj_getter(object_id)
+        if obj is None:
+            abort(404)
         self.session.delete(obj)
         self.session.commit()
         return self.render_response({}, 204)
