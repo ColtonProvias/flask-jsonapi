@@ -85,15 +85,25 @@ class SQLAlchemyEndpoint(JSONAPIEndpoint):
         else:
             return self.query.get(object_id)
 
+    def filter_query(self, query, args):
+        for key, value in args.items():
+            if hasattr(self.model_class, key):
+                field = getattr(self.model_class, key)
+                if callable(field):
+                    continue
+                query = query.filter(field == value)
+        return query
+
     @property
     def serializer(self):
         return JSONAPI(self.model_class).serialize
 
     def collection_get(self):
         include, sort, fields, args = self.parse_request()
-        collection = self.query.all()
+        collection = self.filter_query(self.query, args)
         return self.render_response(self.serializer(collection, fields=fields,
-                                                    sort=sort))
+                                                    sort=sort,
+                                                    include=include))
 
     def object_get(self, object_id):
         include, sort, fields, args = self.parse_request()
@@ -101,7 +111,8 @@ class SQLAlchemyEndpoint(JSONAPIEndpoint):
         if obj is None:
             abort(404)
         return self.render_response(self.serializer(obj, fields=fields,
-                                                    sort=sort))
+                                                    sort=sort,
+                                                    include=include))
 
     def object_delete(self, object_id):
         obj = self.obj_getter(object_id)

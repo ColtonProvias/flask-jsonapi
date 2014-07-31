@@ -58,6 +58,8 @@ class Comment(APIMixin, db.Model):
 
 
 api.add_endpoint(SQLAlchemyEndpoint(Post, db.session))
+api.add_endpoint(SQLAlchemyEndpoint(User, db.session))
+api.add_endpoint(SQLAlchemyEndpoint(Comment, db.session))
 
 
 if __name__ == '__main__':
