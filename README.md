@@ -2,6 +2,8 @@
 
 JSON API-compliant view generators for Flask
 
+**This project is being merged in with SQLAlchemy-JSONAPI in its rewrite.  The new SQLAlchemy-JSONAPI will be released when JSON-API nears finalization.**
+
 # Installation
 
 Clone repository and run `python setup.py install` until this reaches version 0.1.
